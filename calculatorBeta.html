@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flow Ratio Calculator</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+        form {
+            display: inline-block;
+            margin: 0 auto;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <h2>Flow Ratio Calculator</h2>
+    <form id="flowRatioForm">
+        <label for="nozzleDiameter">Nozzle Diameter (mm):</label>
+        <input type="number" id="nozzleDiameter" value="0.4"><br><br>
+
+        <label for="testPrintFlowRate">Flow Rate during Test Print:</label>
+        <input type="number" id="testPrintFlowRate" required><br><br>
+
+        <label for="measurementUnit">Measurement Unit:</label>
+        <select id="measurementUnit">
+            <option value="mm">Millimeters</option>
+            <option value="inches">Inches</option>
+        </select><br><br>
+
+        <strong>Single Wall Measurements:</strong><br>
+        <label for="singleWall1">Single Wall Measurement 1:</label>
+        <input type="number" id="singleWall1" required><br><br>
+        <label for="singleWall2">Single Wall Measurement 2:</label>
+        <input type="number" id="singleWall2" required><br><br>
+        <label for="singleWall3">Single Wall Measurement 3:</label>
+        <input type="number" id="singleWall3" required><br><br>
+        <label for="singleWall4">Single Wall Measurement 4:</label>
+        <input type="number" id="singleWall4" required><br><br>
+
+        <strong>Three Wall Measurements:</strong><br>
+        <label for="threeWall1">3 Wall Measurement 1:</label>
+        <input type="number" id="threeWall1" required><br><br>
+        <label for="threeWall2">3 Wall Measurement 2:</label>
+        <input type="number" id="threeWall2" required><br><br>
+        <label for="threeWall3">3 Wall Measurement 3:</label>
+        <input type="number" id="threeWall3" required><br><br>
+        <label for="threeWall4">3 Wall Measurement 4:</label>
+        <input type="number" id="threeWall4" required><br><br>
+
+        <input type="button" value="Calculate" onclick="calculateFlowRatios()">
+        <input type="reset" value="Reset"><br><br>
+    </form>
+
+    <p id="singleWallResult"></p>
+    <p id="threeWallResult"></p>
+
+    <script>
+        function calculateFlowRatios() {
+            var nozzleDiameter = document.getElementById('nozzleDiameter').value;
+            var testPrintFlowRate = parseFloat(document.getElementById('testPrintFlowRate').value);
+            var measurementUnit = document.getElementById('measurementUnit').value;
+
+            // Function to process measurements
+            function processMeasurements(wallIds) {
+                return wallIds.map(id => {
+                    var measurement = parseFloat(document.getElementById(id).value);
+                    return measurementUnit === "inches" ? measurement * 25.4 : measurement;
+                });
+            }
+
+            // Calculate average for single and three walls
+            var singleWalls = processMeasurements(['singleWall1', 'singleWall2', 'singleWall3', 'singleWall4']);
+            var threeWalls = processMeasurements(['threeWall1', 'threeWall2', 'threeWall3', 'threeWall4']);
+            
+            var singleWallAverage = singleWalls.reduce((a, b) => a + b, 0) / singleWalls.length;
+            var threeWallAverage = threeWalls.reduce((a, b) => a + b, 0) / threeWalls.length;
+
+            // Calculate flow ratios
+            var singleWallFlowRatio = (nozzleDiameter / singleWallAverage) * testPrintFlowRate;
+            var threeWallFlowRatio = (nozzleDiameter * 3 / threeWallAverage) * testPrintFlowRate;
+
+            document.getElementById('singleWallResult').innerHTML = "Calculated Flow Ratio for Single Walls: " + singleWallFlowRatio.toFixed(3);
+            document.getElementById('threeWallResult').innerHTML = "Calculated Flow Ratio for Three Walls: " + threeWallFlowRatio.toFixed(3);
+        }
+    </script>
+</body>
+</html>
